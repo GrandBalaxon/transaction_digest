@@ -25,8 +25,21 @@ def get_mask_account(acc_number: str | int) -> str:
 
 
 def mask_account_card(type_and_number: str) -> str:
-    """"""
+    """Возвращает строку с замаскированным номером карты или счета."""
+    temp_list = type_and_number.split()
+
+    if temp_list[-1].isdigit() and len(temp_list[-1]) == 16:
+        temp_list[-1] = get_mask_card_number(temp_list[-1])
+    elif temp_list[-1].isdigit() and len(temp_list[-1]) == 20:
+        temp_list[-1] = get_mask_account(temp_list[-1])
+
+    return " ".join(temp_list)
 
 
 if __name__ == "__main__":
-    print(get_mask_card_number(7000792289606361), get_mask_account(73654108430135874305), sep="\n")
+    print(
+        get_mask_card_number(7000792289606361),
+        get_mask_account(73654108430135874305),
+        mask_account_card("Счет 73654108430135874305"),
+        sep="\n",
+    )
