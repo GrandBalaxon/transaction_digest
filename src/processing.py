@@ -6,6 +6,16 @@ def filter_by_state(list_of_dicts: List[Dict[str, Any]], state: str = "EXECUTED"
     return [i for i in list_of_dicts if i["state"] == state]
 
 
+def sort_by_date(list_of_dicts: List[Dict[str, Any]], descending: bool = True) -> List[Dict[str, Any]]:
+    """
+    Сортирует список словарей по дате.
+
+    descending: True (по умолчанию) - сортировка по убыванию (от новых к старым).
+                False - сортировка по возрастанию (от старых к новым).
+    """
+    return sorted(list_of_dicts, key=lambda x: x["date"][:10], reverse=descending)
+
+
 if __name__ == "__main__":
     test_list = [
         {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
@@ -14,4 +24,6 @@ if __name__ == "__main__":
         {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
     ]
 
-    print(filter_by_state(test_list))
+    list_ = sort_by_date(test_list)
+    for i in list_:
+        print(i)
