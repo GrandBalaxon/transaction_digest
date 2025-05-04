@@ -1,10 +1,22 @@
 def get_mask_card_number(card_number: str | int) -> str:
     """Маскирует номер банковской карты в формате XXXX XX** **** XXXX."""
+    if card_number is None:
+        raise ValueError("Номер карты не может быть пустым.")
 
     if isinstance(card_number, int):
         card_number = str(card_number)
+    elif isinstance(card_number, str):
+        card_number = card_number.replace(" ", "")
+    else:
+        raise TypeError("Номер карты должен быть строкой или целым числом.")
+
+    # Проверяем на пустую строку после преобразований
+    if not card_number:
+        raise ValueError("Номер карты не может быть пустым.")
+
     if not card_number.isdigit():
         raise ValueError("Номер карты должен состоять только из цифр.")
+
     if len(card_number) != 16:
         raise ValueError("Номер карты должен содержать ровно 16 цифр.")
 
@@ -22,7 +34,3 @@ def get_mask_account(acc_number: str | int) -> str:
         raise ValueError("Номер аккаунта должен содержать ровно 20 цифр.")
 
     return f"**{acc_number[-4:]}"
-
-
-if __name__ == "__main__":
-    print(get_mask_card_number(7000792289606361), get_mask_account(73654108430135874305), sep="\n")
