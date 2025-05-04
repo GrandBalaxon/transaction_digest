@@ -56,3 +56,25 @@ def test_sort_by_date_with_repeats(transactions_stateless):
     ]
 
 
+def test_sort_by_date_milliseconds():
+    assert sort_by_date([
+        {"id": 669, "date": "2019-07-03T18:35:29.512369"},
+        {"id": 445, "date": "2019-07-03T18:35:29.512364"},
+        {"id": 414, "date": "2019-07-03T18:35:29.512367"}
+    ]) == [
+        {"id": 669, "date": "2019-07-03T18:35:29.512369"},
+        {"id": 414, "date": "2019-07-03T18:35:29.512367"},
+        {"id": 445, "date": "2019-07-03T18:35:29.512364"}
+    ]
+
+
+def test_sort_by_date_non_standard():
+    with pytest.raises(ValueError) as exc_info:
+        sort_by_date([
+            {"id": 6, "date": "2019-07-03"},
+            {"id": 5, "date": "2019-07-04"}
+        ])
+    assert str(exc_info.value) == """
+        Некорректный или нестандартный формат дат.
+        Используйте расширенный формат ISO 8601 с указанием даты, времени и микросекунд.
+        """
