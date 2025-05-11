@@ -28,6 +28,11 @@ def get_mask_account(acc_number: str | int) -> str:
 
     if isinstance(acc_number, int):
         acc_number = str(acc_number)
+    elif isinstance(acc_number, str):
+        acc_number = acc_number.replace(" ", "")
+    else:
+        raise TypeError("Номер счета должен быть строкой или целым числом.")
+
     if not acc_number.isdigit():
         raise ValueError("Номер аккаунта должен состоять только из цифр.")
     if len(acc_number) != 20:
