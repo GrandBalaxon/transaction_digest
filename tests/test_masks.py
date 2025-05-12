@@ -34,6 +34,11 @@ def test_get_mask_card_number_type_error():
         get_mask_card_number(222233334444.5555)
 
 
+def test_get_mask_card_number_if_none():
+    with pytest.raises(ValueError, match="Номер карты не может быть пустым."):
+        get_mask_card_number(None)
+
+
 @pytest.mark.parametrize("acc_number, expected", [
     ("73654108430135874305", "**4305"),
     (73654108430135874305, "**4305"),
