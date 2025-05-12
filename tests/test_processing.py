@@ -22,12 +22,12 @@ def test_filter_by_state_empty():
 
 
 def test_filter_by_state_key_error(transactions_stateless):
-    with pytest.raises(KeyError):
-        assert filter_by_state(transactions_stateless)
+    with pytest.raises(KeyError, match="'В словаре с индексом 0 отсутствует ключ state.'"):
+        filter_by_state(transactions_stateless)
 
 
 def test_filter_by_state_none():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="На входе получен не правильный тип данных."):
         assert filter_by_state(None)
 
 
@@ -68,12 +68,31 @@ def test_sort_by_date_milliseconds():
 
 
 def test_sort_by_date_non_standard():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(
+            ValueError,
+            match="Некорректный или нестандартный формат даты 2019-07-03 в словаре по индексу 0."
+    ):
         sort_by_date([
             {"id": 6, "date": "2019-07-03"},
             {"id": 5, "date": "2019-07-04"}
         ])
-    assert str(exc_info.value) == """
-        Некорректный или нестандартный формат дат.
-        Используйте расширенный формат ISO 8601 с указанием даты, времени и микросекунд.
-        """
+
+
+def test_sort_by_date_not_real_date():
+    with pytest.raises(
+            ValueError,
+            match="Строка 2019-07-32T18:35:29.512369 словаря по индексу 0 не является реальной датой и временем."
+    ):
+        sort_by_date([
+            {"id": 6, "date": "2019-07-32T18:35:29.512369"},
+        ])
+
+
+def test_sort_by_date_type_error():
+    with pytest.raises(
+            TypeError,
+            match="Строка 88005553535 словаря по индексу 0 имеет не правильный тип данных."
+    ):
+        sort_by_date([
+            {"id": 6, "date": 88005553535},
+        ])
