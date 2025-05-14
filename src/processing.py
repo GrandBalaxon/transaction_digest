@@ -1,29 +1,44 @@
+from datetime import datetime
 from typing import Any, Dict, List
 
 
-def filter_by_state(list_of_dicts: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
+def filter_by_state(transactions_list: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
     """Фильтрует список словарей на основе значения ключа 'state'."""
-    return [i for i in list_of_dicts if i["state"] == state]
+
+    try:
+        for index, dict_ in enumerate(transactions_list):
+            if "state" not in dict_:
+                raise KeyError(f"В словаре с индексом {index} отсутствует ключ state.")
+
+        return [i for i in transactions_list if i["state"] == state]
+    except TypeError:
+        raise TypeError("На входе получен не правильный тип данных.")
 
 
-def sort_by_date(list_of_dicts: List[Dict[str, Any]], descending: bool = True) -> List[Dict[str, Any]]:
+def sort_by_date(transactions_list: List[Dict[str, Any]], descending: bool = True) -> List[Dict[str, Any]]:
     """
     Сортирует список словарей по дате.
+
+    Формат дат - расширенный ISO 8601 с указанием даты, времени и 6 символов микросекунд.
+    Пример: '2018-06-30T02:08:58.425572'
 
     descending: True (по умолчанию) - сортировка по убыванию (от новых к старым).
                 False - сортировка по возрастанию (от старых к новым).
     """
-    return sorted(list_of_dicts, key=lambda x: x["date"][:10], reverse=descending)
 
+    # Проверка списка словарей на правильность записей дат
+    for index, data in enumerate(transactions_list):
+        if not isinstance(data["date"], str):
+            raise TypeError(f"Строка {data['date']} словаря по индексу {index} имеет не правильный тип данных.")
+        elif len(data["date"]) != 26:
+            raise ValueError(
+                f"Некорректный или нестандартный формат даты {data["date"]} в словаре по индексу {index}."
+            )
+        try:
+            datetime.fromisoformat(data["date"])
+        except ValueError:
+            raise ValueError(
+                f"Строка {data['date']} словаря по индексу {index} не является реальной датой и временем."
+            )
 
-if __name__ == "__main__":
-    test_list = [
-        {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-        {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-        {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-        {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-    ]
-
-    list_ = sort_by_date(test_list)
-    for i in list_:
-        print(i)
+    return sorted(transactions_list, key=lambda x: x["date"], reverse=descending)
