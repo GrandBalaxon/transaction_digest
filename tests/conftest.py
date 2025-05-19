@@ -121,3 +121,15 @@ def transactions_full_info():
         }
     ]
     return list_
+
+
+@pytest.fixture
+def card_numbers():
+    list_ = [
+        "0000 0000 0000 0001",
+        "0000 0000 0000 0002",
+        "0000 0000 0000 0003",
+        "0000 0000 0000 0004",
+        "0000 0000 0000 0005",
+    ]
+    return list_

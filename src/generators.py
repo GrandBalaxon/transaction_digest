@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, Union
 
 
 def filter_by_currency(transactions_list: List[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]:
@@ -65,3 +65,42 @@ def transaction_descriptions(transactions_list: List[Dict[str, Any]]) -> Iterato
             yield transaction["description"]
     except KeyError:
         raise KeyError("На вход не получен список словарей нужного формата.")
+
+
+def card_number_generator(start: Union[int, str], finish: Union[int, str]) -> Iterator[str]:
+    """
+    Функция-генератор который выдает номера банковских карт в формате "XXXX XXXX XXXX XXXX", где X — цифра номера карты.
+    Генератор может сгенерировать номера карт в заданном диапазоне от 0000 0000 0000 0001 до 9999 9999 9999 9999.
+    Генерация значений происходит от меньшего к большому.
+
+    На start и finish подаются строковые или численные значения.
+    При указывании значения от большего к меньшему - функция всё равно отработает как полагается, поменяв их местами.
+    """
+    # Проверка на тип str
+    try:
+        if isinstance(start, str):
+            start = int(start.replace(" ", ""))
+        if isinstance(finish, str):
+            finish = int(finish.replace(" ", ""))
+    except ValueError:
+        raise ValueError("Строки в значениях start / finish содержат не допустимые символы.")
+
+    try:
+        # Если start > finish то меняем их местами
+        if start > finish:
+            start, finish = finish, start
+
+        # Проверка на соответствие старта и финиша необходимому диапазону
+        if not (1 <= start <= 9999999999999999) or not (1 <= finish <= 9999999999999999):
+            raise ValueError(
+                "Заданные числа должны находиться в диапазоне от 0000 0000 0000 0001 до 9999 9999 9999 9999."
+            )
+
+        for card_number in range(start, finish + 1):
+            str_card_number = str(card_number)
+            full_str_cd_num = (16 - len(str_card_number)) * "0" + str_card_number
+
+            yield f"{full_str_cd_num[:4]} {full_str_cd_num[4:8]} {full_str_cd_num[8:12]} {full_str_cd_num[12:]}"
+
+    except TypeError:
+        raise TypeError("На входе получены не допустимые типы данных.")

@@ -1,6 +1,6 @@
 import pytest
 
-from src.generators import filter_by_currency, transaction_descriptions
+from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 
 def test_filter_by_usd_currency(transactions_full_info):
@@ -165,3 +165,68 @@ def test_transaction_descriptions_wrong_list_format(transactions_stateless):
     iterator = transaction_descriptions(transactions_stateless)
     with pytest.raises(KeyError, match="'На вход не получен список словарей нужного формата.'"):
         next(iterator)
+
+
+@pytest.mark.parametrize("start, finish", [
+    (1, 5),
+    (5, 1),
+    ("0000 0000 0000 0001", "0000 0000 0000 0005"),
+    (1, "0000 0000 0000 0005")
+])
+def test_card_number_generator(card_numbers, start, finish):
+    """Тестируем совпадение значений от 1 до 5 при различных входных данных."""
+    i = 0
+    iterator = card_number_generator(start, finish)
+    while True:
+        try:
+            assert next(iterator) == card_numbers[i]
+            i += 1
+        except StopIteration:
+            break
+
+
+def test_card_number_generator_big_values():
+    """Тестируем работу функции с реальным примером карт, первые 8 цифр не 0."""
+    list_ = [
+        "5469 4100 0000 0005",
+        "5469 4100 0000 0006",
+        "5469 4100 0000 0007",
+        "5469 4100 0000 0008"
+    ]
+    i = 0
+    iterator = card_number_generator("5469 4100 0000 0005", "5469 4100 0000 0008")
+    while True:
+        try:
+            assert next(iterator) == list_[i]
+            i += 1
+        except StopIteration:
+            break
+
+
+@pytest.mark.parametrize("start, finish", [
+    (-1, 10),
+    ("9999 9999 9999 9998", 9999999999999999 + 1)
+])
+def test_card_number_generator_out_of_boundaries(start, finish):
+    """Тесты на случаи выхода из допустимого диапазона."""
+    with pytest.raises(
+            ValueError,
+            match="Заданные числа должны находиться в диапазоне от 0000 0000 0000 0001 до 9999 9999 9999 9999."
+    ):
+        iterator = card_number_generator(start, finish)
+        print(next(iterator))
+
+
+def test_card_number_generator_invalid_str_input():
+    with pytest.raises(
+            ValueError,
+            match="Строки в значениях start / finish содержат не допустимые символы."
+    ):
+        iterator = card_number_generator("-1a.", 10)
+        print(next(iterator))
+
+
+def test_card_number_generator_type_error():
+    with pytest.raises(TypeError, match="На входе получены не допустимые типы данных."):
+        iterator = card_number_generator(["-1a."], 10)
+        print(next(iterator))
