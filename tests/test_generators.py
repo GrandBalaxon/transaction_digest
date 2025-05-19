@@ -1,6 +1,6 @@
 import pytest
 
-from src.generators import filter_by_currency
+from src.generators import filter_by_currency, transaction_descriptions
 
 
 def test_filter_by_usd_currency(transactions_full_info):
@@ -117,5 +117,51 @@ def test_filter_by_currency_wrong_list_format(transactions_stateless):
     Сообщение об ошибке дополнительно обрамляется кавычками '', т.к KeyError.
     """
     iterator = filter_by_currency(transactions_stateless, "USD")
+    with pytest.raises(KeyError, match="'На вход не получен список словарей нужного формата.'"):
+        next(iterator)
+
+
+@pytest.mark.parametrize("i, expected",
+                         [
+                             (0, "Перевод организации"),
+                             (1, "Перевод со счета на счет"),
+                             (2, "Оплата услуг"),
+                             (3, "Перевод между счетами"),
+                             (4, "Покупка в интернет-магазине"),
+                             (5, "Пополнение счета")
+                          ],
+                         )
+def test_transaction_descriptions(transactions_full_info, i, expected):
+    """
+    Тестирование работы со списком в фикстуре.
+    Ожидается правильная выдача значений в нужном порядке.
+    """
+    iterator = transaction_descriptions(transactions_full_info)
+    list_of_expected = [x["description"] for x in transactions_full_info]
+    index = 0
+    while True:
+        try:
+            if index == i:
+                assert next(iterator) == list_of_expected[i]
+            next(iterator)
+            index += 1
+        except StopIteration:
+            break
+
+
+def test_transaction_descriptions_empty_list_case():
+    """Тестирование работы с пустым списком."""
+    list_ = []
+    with pytest.raises(ValueError, match="На вход не получен список словарей нужного формата."):
+        iterator = transaction_descriptions(list_)
+        next(iterator)
+
+
+def test_transaction_descriptions_wrong_list_format(transactions_stateless):
+    """
+    Тест работы с неправильным форматом словаря на входе.
+    Сообщение об ошибке дополнительно обрамляется кавычками '', т.к KeyError.
+    """
+    iterator = transaction_descriptions(transactions_stateless)
     with pytest.raises(KeyError, match="'На вход не получен список словарей нужного формата.'"):
         next(iterator)
