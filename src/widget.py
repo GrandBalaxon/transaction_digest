@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Optional
 
 from src.masks import get_mask_account, get_mask_card_number
 
 SUPPORTED_CARDS = ("Maestro", "MasterCard", "Visa Classic", "Visa Platinum", "Visa Gold")
 
 
-def mask_account_card(type_and_number: str) -> str | None:
+def mask_account_card(type_and_number: str) -> Optional[str]:
     """Возвращает строку с замаскированным номером карты или счета."""
 
     type_and_number = type_and_number.strip()
@@ -36,8 +37,10 @@ def mask_account_card(type_and_number: str) -> str | None:
     else:
         raise ValueError("Не корректные данные, указанный номер не является ни номером карты, ни счета.")
 
+    assert False, "Сюда выполнение не должно дойти"
 
-def get_date(date: str) -> str | None:
+
+def get_date(date: str) -> Optional[str]:
     """
     Функция возвращает строку с датой в формате 'ДД.ММ.ГГГГ'
     На вход подается строка в расширенном формате ISO 8601 с указанием даты, времени и 6 символов микросекунд.
@@ -58,3 +61,5 @@ def get_date(date: str) -> str | None:
             return f"{date[8:10]}.{date[5:7]}.{date[:4]}"
     except ValueError:
         raise ValueError("Некорректный ввод данных: строка не является допустимой датой и временем.")
+
+    assert False, "Сюда выполнение не должно дойти"

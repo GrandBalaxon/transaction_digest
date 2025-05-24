@@ -1,5 +1,5 @@
 def get_mask_card_number(card_number: str | int) -> str:
-    """Маскирует номер банковской карты в формате XXXX XX** **** XXXX."""
+    """Маскирует номер банковской карты в формате XXXX XX** **** XXXX, где X — это цифра номера."""
     if card_number is None:
         raise ValueError("Номер карты не может быть пустым.")
 
@@ -24,7 +24,7 @@ def get_mask_card_number(card_number: str | int) -> str:
 
 
 def get_mask_account(acc_number: str | int) -> str:
-    """Маскирует номер счета в формате **XXXX."""
+    """Маскирует номер счета в формате **XXXX, где `X` — это цифра номера."""
 
     if isinstance(acc_number, int):
         acc_number = str(acc_number)
